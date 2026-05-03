@@ -8,24 +8,16 @@ import com.sys.ecomerce.entity.User;
 import com.sys.ecomerce.entity.UserContact;
 import com.sys.ecomerce.enums.ContactRequestStatus;
 import com.sys.ecomerce.enums.UserRole;
-//import com.sys.ecomerce.mapper.CartItemMapper;
 import com.sys.ecomerce.mapper.ContactRequestMapper;
-//import com.sys.ecomerce.mapper.MessageMapper;
-//import com.sys.ecomerce.mapper.OrderMapper;
-//import com.sys.ecomerce.mapper.OrderItemMapper;
-//import com.sys.ecomerce.mapper.ProductBoardMessageMapper;
-//import com.sys.ecomerce.mapper.ReturnRequestMapper;
 import com.sys.ecomerce.mapper.UserAddressMapper;
 import com.sys.ecomerce.mapper.UserContactMapper;
 import com.sys.ecomerce.mapper.UserCouponMapper;
 import com.sys.ecomerce.mapper.UserMapper;
-//import com.sys.ecomerce.mapper.WallpaperMapper;
 import com.sys.ecomerce.model.ContactRequestView;
 import com.sys.ecomerce.model.LoginRequest;
-import com.sys.ecomerce.model.RegisterRequest;
-import com.sys.ecomerce.model.ResetPasswordRequest;
 import com.sys.ecomerce.model.UserPublicProfile;
 import com.sys.ecomerce.service.UserService;
+import commons.security.RsaUtils;
 import commons.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,37 +46,13 @@ public class UserServiceImpl implements UserService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
+    private final RsaUtils rsaUtils;
     private final UserMapper userMapper;
     private final UserContactMapper userContactMapper;
     private final ContactRequestMapper contactRequestMapper;
-//    private final OrderMapper orderMapper;
-//    private final OrderItemMapper orderItemMapper;
-//    private final CartItemMapper cartItemMapper;
     private final UserAddressMapper userAddressMapper;
     private final UserCouponMapper userCouponMapper;
-//    private final ReturnRequestMapper returnRequestMapper;
-//    private final MessageMapper messageMapper;
-//    private final ProductBoardMessageMapper productBoardMessageRepository;
-//    private final WallpaperMapper wallpaperMapper;
     private final ObjectMapper objectMapper;
-
-    @Override
-    public User register(RegisterRequest request) {
-        if (userMapper.existsByUsername(request.getUsername())) {
-            throw new BusinessException("用户名已存在");
-        }
-        if (userMapper.existsByEmail(request.getEmail())) {
-            throw new BusinessException("邮箱已被注册");
-        }
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
-        user.setEmail(request.getEmail());
-        user.setRole(UserRole.USER);
-        user.setCreatedAt(LocalDateTime.now());
-        userMapper.insert(user);
-        return getUserById(user.getId());
-    }
 
     @Override
     public User login(LoginRequest request) {
@@ -92,21 +60,11 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new BusinessException("用户不存在");
         }
-        if (!user.getPassword().equals(request.getPassword())) {
+        if (!rsaUtils.decrypt(user.getPassword()).equals(request.getPassword())) {
             throw new BusinessException("密码错误");
         }
-        return user;
-    }
 
-    @Override
-    public User resetPassword(ResetPasswordRequest request) {
-        User user = userMapper.findByEmail(request.getEmail());
-        if (user == null) {
-            throw new BusinessException("该邮箱未注册");
-        }
-        user.setPassword(request.getNewPassword());
-        userMapper.update(user);
-        return getUserById(user.getId());
+        return user;
     }
 
     @Override
@@ -160,6 +118,8 @@ public class UserServiceImpl implements UserService {
         userMapper.update(user);
         return getUserById(id);
     }
+
+    // ========== 以下所有方法保持原样，不需要修改 ==========
 
     private String normalizeAvatar(String avatar) {
         String normalized = avatar.trim();
@@ -233,17 +193,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User changePassword(Long id, String oldPassword, String newPassword) {
-        User user = getUserById(id);
-        if (!user.getPassword().equals(oldPassword)) {
-            throw new BusinessException("原密码错误");
-        }
-        user.setPassword(newPassword);
-        userMapper.update(user);
-        return getUserById(id);
-    }
-
-    @Override
     @Transactional
     public User updateRole(Long operatorId, Long targetId, String roleStr) {
         assertSuperAdmin(operatorId);
@@ -306,34 +255,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long operatorId, Long targetId) {
-
+        // 暂未实现
     }
-//
-//    @Override
-//    @Transactional
-//    public void deleteUser(Long operatorId, Long targetId) {
-//        assertSuperAdmin(operatorId);
-//        User target = getUserById(targetId);
-//        if (target.getRole() == UserRole.SUPER_ADMIN) {
-//            throw new BusinessException("不可删除超级管理员账号");
-//        }
-//        List<Long> orderIds = orderMapper.findIdsByUserId(targetId);
-//        for (Long orderId : orderIds) {
-//            orderItemMapper.deleteByOrderId(orderId);
-//        }
-//        orderMapper.deleteByUserId(targetId);
-//        messageMapper.deleteAllInvolvingUser(targetId);
-//        returnRequestMapper.deleteByUserId(targetId);
-//        cartItemMapper.deleteByUserId(targetId);
-//        userAddressMapper.deleteByUserId(targetId);
-//        userCouponMapper.deleteByUserId(targetId);
-//        contactRequestMapper.deleteAllInvolvingUser(targetId);
-//        userContactMapper.deleteByOwnerId(targetId);
-//        userContactMapper.deleteByContactId(targetId);
-//        productBoardMessageRepository.deleteByUserId(targetId);
-//        wallpaperMapper.deleteByUserId(targetId);
-//        userMapper.deleteById(targetId);
-//    }
 
     @Override
     public List<String> listAssignableModuleKeys(Long operatorId) {

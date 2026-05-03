@@ -3,8 +3,6 @@ package com.sys.ecomerce.controller;
 import com.sys.ecomerce.entity.User;
 import com.sys.ecomerce.model.ContactRequestView;
 import com.sys.ecomerce.model.LoginRequest;
-import com.sys.ecomerce.model.RegisterRequest;
-import com.sys.ecomerce.model.ResetPasswordRequest;
 import com.sys.ecomerce.model.UserPublicProfile;
 import com.sys.ecomerce.service.UserService;
 import commons.result.Result;
@@ -23,20 +21,10 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/register")
-    public Result<User> register(@RequestBody RegisterRequest request) {
-        return Result.success("注册成功", userService.register(request));
-    }
-
     @PostMapping("/login")
     public Result<User> login(@RequestBody LoginRequest request) {
         log.warn("登录失败: {}", request.getUsername());
         return Result.success("登录成功", userService.login(request));
-    }
-
-    @PostMapping("/reset-password")
-    public Result<User> resetPassword(@RequestBody ResetPasswordRequest request) {
-        return Result.success("密码重置成功", userService.resetPassword(request));
     }
 
     @GetMapping("/{id}")
@@ -136,12 +124,6 @@ public class UserController {
     public Result<User> updateProfile(@PathVariable Long id, @RequestBody Map<String, String> body) {
         User user = userService.updateProfile(id, body.get("username"), body.get("email"), body.get("avatar"), body.get("bio"));
         return Result.success("个人信息更新成功", user);
-    }
-
-    @PutMapping("/password/{id}")
-    public Result<User> changePassword(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        User user = userService.changePassword(id, body.get("oldPassword"), body.get("newPassword"));
-        return Result.success("密码修改成功", user);
     }
 
     @PutMapping("/role/{id}")

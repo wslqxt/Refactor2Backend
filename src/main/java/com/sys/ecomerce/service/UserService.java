@@ -3,19 +3,13 @@ package com.sys.ecomerce.service;
 import com.sys.ecomerce.entity.User;
 import com.sys.ecomerce.model.ContactRequestView;
 import com.sys.ecomerce.model.LoginRequest;
-import com.sys.ecomerce.model.RegisterRequest;
-import com.sys.ecomerce.model.ResetPasswordRequest;
 import com.sys.ecomerce.model.UserPublicProfile;
 
 import java.util.List;
 
 public interface UserService {
 
-    User register(RegisterRequest request);
-
     User login(LoginRequest request);
-
-    User resetPassword(ResetPasswordRequest request);
 
     User getUserById(Long id);
 
@@ -26,8 +20,6 @@ public interface UserService {
     List<User> listAdminsForModuleConfig(Long operatorId);
 
     User updateProfile(Long id, String username, String email, String avatar, String bio);
-
-    User changePassword(Long id, String oldPassword, String newPassword);
 
     User updateRole(Long operatorId, Long targetId, String roleStr);
 
