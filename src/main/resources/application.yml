@@ -1,0 +1,61 @@
+server:
+  port: ${SERVER_PORT:8090}
+
+spring:
+  cache:
+    type: caffeine
+    caffeine:
+      spec: initialCapacity=100,maximumSize=3000,expireAfterWrite=10m
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 20MB
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:supermarket}?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false&connectTimeout=120000&socketTimeout=180000&tcpKeepAlive=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 90000
+      maximum-pool-size: 10
+      keepalive-time: 300000
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        useLocalSessionState: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        elideSetAutoCommits: true
+        maintainTimeStats: false
+
+  sql:
+    init:
+      mode: always
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: 'NULL'
+
+app:
+  super-admin-username: ${SUPER_ADMIN_USERNAME:}
+
+ai:
+  deepseek:
+    api-key: ${DEEPSEEK_API_KEY:sk-87b64e5ca7054d73a4fa0ab6d5cf06a5}
+    base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
+    model: ${DEEPSEEK_MODEL:deepseek-chat}
+
+file:
+  upload-dir: D:/SoftTrain/backend/uploads
+
+alipay:
+  app-id: 9021000162628691
+  private-key: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCKH2TfeXK1veIlqW2BrmKhqAVxF29XEW5IFhfaH/rWeRZitVkUy+DvJv3YgsmRIcy/LtfGW3bbh6krHN1zk7LPHpL8QTkUFr6rLVxWamPO6vVAawF0ZmJh0ZmS1WTwKnAAqm0Nu+d7fwesrRavZgTxvdkWib0TxGPLzt98847do2t+S7dnwW5Zmi5TdSVqIIOHntiCOSLT3ueShUCJFP0ajUpgokZx4MiP5ebNg5TrUVD4hMrSf6s3VgXd/rvVm9wN0P07MJ8DGalfOb1p8tAhODR43SckXITn7xVbdKOQwrLZAHrZQxEaLSQ8w9TCERcJM8Q2+ZL6N1ECaWHZFttBAgMBAAECggEAf1t1Oq4UPEoK1SlFZNbz8RUpd17hdgoHgwaEFcd5FftuzbNjoU5gaIOues4Vp/HfhcVehnLdxIxxSuSBuUlODbamV1yYkdJrGxFnW/MbdralTzGblMW3H3URwxdqzByFS8fZaFmDlxbJb8nl6fMKyhCAtExrAGgMkOd+oQs/B1OFxuwEiGQR1JF73itpVErq1iiNsUoZUPo531RLUxptDE81fAcwfeJHqa6PbKTIQl4cdn97ock2i5h6LWd201eojgpRuSYDFrPayUEJkTycoLxOQGCabveNa2V2XsGkq0GZk6KtREpkPPvDgAxTYk7hvu8V3akO5HqKQ0MDKe1PxQKBgQDGlGaCkgWoG/0usJ/qEDmNA8D7tDdkFh4WpglZY6YR3PeH1AQio02F+JdB4vMVBhr7ew6GtlgGmz4SL7B1Fj3VuzxwpBbnnDdRthOrroetj60Yo+FBniHWIt8shniMyVa/jw6PQqJn/b6sRTJR/XoHUbdr7zr7CRiDoDgAdFQGiwKBgQCyD71g1zSIBttVw1iPx3iGOJ0+5g/VLCnf6OL4n7NNRpLRCWSjKAXnEqCO7s7094zJUYoZp/bjroWObpaDmpkEROsiHHVekg2V1VW5mxgccPYyJooAnRFN6v7C+qENOwor1tiHIIkp1O8ml1+tLgp0sQnmZRLBWaWXmFqSuw7q4wKBgQC/PCCwM4FhEHs04IFP/on9xBSwETCaoTYep40vWWiPoVV7p/DHjq5Uiz7XA4EGyRdpAWvOzYFd81jGWMi9KUspLiQZcdxg9a7McOTmm7Ars8aFiSSfdXKubmyvy1wCcM6qsVDbI9eU/+cEraq1DL7cl5RlTEBniq3h7ISh42Ub2wKBgDw6xrwzDznT1+0ynopD1qjQDaBxAXoB7kgm5l9i5auF67N5kej+aMC4tEak0Kxb7+tJAYWcIw7wwYxkK9VoPcoL5d0r8yeCD8ZW2yBlLcqxCxX7o0KB3pCUpIgfbsqi5dXeXm+Wuc7EkABlw584q6C9IbQlDCsKv9B/YGOxkmIxAoGAH21XdgunjDhrLUvK3ou7d/Ju9lSJL1A/NhXa7AC7O8/wc2aHAj+/8iE32hgIBFV2baJH1bxTwUnlqQTPMKCjiBg51A7wKpPKraNLLKR3tYJZ3oRO+m2tdEVZnya0GnP0INwX3tGuq8yC2B9ev5LziFGLEHq92iZcLFff8AjgD8w=
+  alipay-public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5QTy4wrWMVd/sBkc4x+cFhBM4SVYyFyTutBb3Tt4Ji2fsZEDyWKYd7vkXvqy6tUBuPVZrT5V/qhrTU11ui2RRGSvNKmHDPU81B1DAj08DbdcFLg27LVIg9z/3phOgfYBD7SBgJSewqfanJy/QWNSwvxkwtoHOBZEInK7/a8bZBPYesghrhdpwJUJxHTKt23++Jsl1jaiGyKiMyD8ghTlI2cqY15mdiD7HzIsByoOtqRDLSiepxureOlGnUztT+goV875177avbHc9PZr0cGP5hDUMtoO9qBRgxcg2C88fgBd+KqAr2ebFBN4VvuApWkhhCm23qf3yWuZiB+ow/I8bQIDAQAB
+  gateway-url: https://openapi-sandbox.dl.alipaydev.com/gateway.do
+  notify-url: http://localhost:${server.port}/api/pay/notify
+  return-url: http://localhost:5173/pay-result
